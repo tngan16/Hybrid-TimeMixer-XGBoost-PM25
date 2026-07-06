@@ -1,0 +1,36 @@
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+*.egg-info/
+.ipynb_checkpoints/
+
+# Generated data and experiment artefacts (keep documentation/placeholders)
+data/processed/*.csv
+data/processed/*.json
+!data/processed/.gitkeep
+results/*.csv
+results/*.json
+results/*.npz
+results/*.pt
+!results/README.md
+artifacts/
+data/stations.csv
+data/raw/stations/*.csv
+
+# LaTeX build products
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.toc
+paper/main.pdf
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

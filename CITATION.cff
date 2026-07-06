@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+title: "A Hybrid TimeMixer-XGBoost Framework for Multi-Horizon PM2.5 Forecasting Using Historical PM2.5 Time-Series Data"
+message: "Please cite this software and accompanying paper."
+type: software
+version: 1.0.0
+authors:
+  - family-names: "[Student surname]"
+    given-names: "[Student name]"

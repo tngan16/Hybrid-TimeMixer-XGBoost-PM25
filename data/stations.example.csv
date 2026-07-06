@@ -1,0 +1,4 @@
+station_id,station_name,site_type,path
+MY1,London Marylebone Road,Urban Traffic,data/raw/London_Marylebone_PM25.csv
+KC1,London N. Kensington,Urban Background,data/raw/stations/KC1_PM25.csv
+HP1,London Honor Oak Park,Urban Background,data/raw/stations/HP1_PM25.csv

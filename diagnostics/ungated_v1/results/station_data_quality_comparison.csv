@@ -1,0 +1,6 @@
+station_id,station_name,site_type,path,raw_rows,missing_or_non_numeric,negative_values,inserted_grid_rows,unresolved_missing,largest_gap_hours,outlier_iqr_high,outlier_iqr_extreme,rolling_spike_outliers,temporal_jump_flags,unknown_instruments,instrument_change_count,low_coverage_years
+MY1,London Marylebone Road,Urban Traffic,data/raw/stations/London_Marylebone_PM25.csv,87672,8087,238,0,7676,1656,4461,1338,306,400,,1,"[{""year"": 2020, ""coverage"": 0.7781193078324226}]"
+BIR_A4540,Birmingham A4540,Urban Traffic,data/raw/stations/BIR_A4540_PM25.csv,43824,228,0,1825,171,76,3076,1000,584,219,,0,[]
+HP1,London Honor Oak Park,Urban Background,data/raw/stations/HP1_PM25.csv,87672,26862,0,3652,26797,26305,5209,2134,865,305,,0,"[{""year"": 2016, ""coverage"": 0.0}, {""year"": 2017, ""coverage"": 0.0}, {""year"": 2018, ""coverage"": 0.0}]"
+CHB,Chilbolton,Rural Background,data/raw/stations/CHB_PM25.csv,87432,4186,561,3642,4183,1596,6416,2130,977,416,,1,"[{""year"": 2024, ""coverage"": 0.7344034608378871}]"
+KC1,London North Kensington,Urban Background,data/raw/stations/KC1_PM25.csv,87672,1714,75,3652,1528,443,7174,2836,1007,431,,1,[]
