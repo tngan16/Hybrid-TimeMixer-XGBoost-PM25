@@ -1,5 +1,48 @@
 # Hybrid TimeMixer–XGBoost for Multi-Horizon PM2.5 Forecasting
 
+## Sample-aligned revision
+
+This repository has been reorganized to follow the dashboard/report style of
+the provided `PM25-Weather-DAP391m-Report-Paper-Sample.zip`, while keeping this
+project's own UK-Air PM2.5-only dataset, horizons, methods, and results. The
+sample is used as a presentation and structure reference only; no NSW/weather
+dataset or sample model weights are used in the research claims.
+
+### Dashboard structure
+
+```text
+app/
+├── streamlit_app.py              Main dashboard router
+├── components/
+│   ├── overview_tab.py           Dataset analytics and station preview
+│   ├── performance_tab.py        Five-station model results
+│   ├── figures_tab.py            Generated figure gallery
+│   ├── chatbot_tab.py            Static research Q&A for demo
+│   └── about_tab.py              Project description and method notes
+├── pipeline/
+│   └── data_pipeline.py          Cached readers for this repo's data/results
+└── visuals/
+    └── charts.py                 Reusable Streamlit chart helpers
+```
+
+### Dashboard import map
+
+```text
+streamlit_app.py
+├── pipeline.data_pipeline        read station/result artifacts
+├── components.overview_tab       render_overview()
+├── components.performance_tab    render_performance()
+├── components.figures_tab        render_figures()
+├── components.chatbot_tab        render_chatbot()
+└── components.about_tab          render_about()
+```
+
+Run the dashboard from the repository root:
+
+```powershell
+streamlit run app/streamlit_app.py
+```
+
 ## Reviewer revision
 
 This copy preserves the original project while implementing the requested
