@@ -1,0 +1,6 @@
+station_id,station_name,site_type,path,coverage_note
+MY1,London Marylebone Road,Urban Traffic,data/raw/stations/London_Marylebone_PM25.csv,Existing baseline dataset
+BIR_A4540,Birmingham A4540,Urban Traffic,data/raw/stations/BIR_A4540_PM25.csv,2021-2025 coverage
+HP1,London Honor Oak Park,Urban Background,data/raw/stations/HP1_PM25.csv,2016-2018 effectively absent
+CHB,Chilbolton,Rural Background,data/raw/stations/CHB_PM25.csv,Instrument change in July 2018
+KC1,London North Kensington,Urban Background,data/raw/stations/KC1_PM25.csv,Instrument change at end of 2017

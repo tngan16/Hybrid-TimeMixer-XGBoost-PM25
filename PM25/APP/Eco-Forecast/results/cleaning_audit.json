@@ -1,0 +1,21 @@
+{
+  "raw_rows": 87672,
+  "invalid_timestamps": 0,
+  "missing_or_non_numeric": 8087,
+  "negative_values": 238,
+  "duplicate_rows": 0,
+  "unknown_instruments": [],
+  "instrument_changes": [
+    "2021-12-22 12:00:00+00:00"
+  ],
+  "complete_hourly_rows": 87672,
+  "inserted_grid_rows": 0,
+  "interpolated_values": 649,
+  "unresolved_missing": 7676,
+  "largest_gap_hours": 1656,
+  "short_gap_limit": 3,
+  "outlier_iqr_high": 4461,
+  "outlier_iqr_extreme": 1338,
+  "rolling_spike_outliers": 306,
+  "temporal_jump_flags": 400
+}

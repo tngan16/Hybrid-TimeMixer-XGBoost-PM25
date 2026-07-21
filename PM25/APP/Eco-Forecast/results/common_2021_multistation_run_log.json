@@ -1,0 +1,227 @@
+[
+  {
+    "station_id": "MY1",
+    "seed": 0,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "MY1",
+    "seed": 1,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "MY1",
+    "seed": 2,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "MY1",
+    "seed": 3,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "MY1",
+    "seed": 4,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "BIR_A4540",
+    "seed": 0,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "BIR_A4540",
+    "seed": 1,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "BIR_A4540",
+    "seed": 2,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "BIR_A4540",
+    "seed": 3,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "BIR_A4540",
+    "seed": 4,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "HP1",
+    "seed": 0,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "HP1",
+    "seed": 1,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "HP1",
+    "seed": 2,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "HP1",
+    "seed": 3,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "HP1",
+    "seed": 4,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "CHB",
+    "seed": 0,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "CHB",
+    "seed": 1,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "CHB",
+    "seed": 2,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "CHB",
+    "seed": 3,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "CHB",
+    "seed": 4,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "KC1",
+    "seed": 0,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "KC1",
+    "seed": 1,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "KC1",
+    "seed": 2,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "KC1",
+    "seed": 3,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  },
+  {
+    "station_id": "KC1",
+    "seed": 4,
+    "epochs": 30,
+    "train_start": "2021-01-01 00:00:00+00:00",
+    "output_prefix": "common_2021_",
+    "method_version": "gated_residual_v2",
+    "status": "completed"
+  }
+]

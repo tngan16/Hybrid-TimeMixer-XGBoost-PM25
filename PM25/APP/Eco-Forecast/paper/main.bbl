@@ -1,0 +1,81 @@
+\begin{thebibliography}{10}
+
+\bibitem{who2021aqg}
+{World Health Organization}.
+\newblock Who global air quality guidelines: Particulate matter, ozone,
+  nitrogen dioxide, sulfur dioxide and carbon monoxide.
+\newblock World Health Organization, 2021.
+
+\bibitem{hochreiter1997lstm}
+Sepp Hochreiter and Jürgen Schmidhuber.
+\newblock Long short-term memory.
+\newblock {\em Neural Computation}, 9(8):1735--1780, 1997.
+
+\bibitem{chen2016xgboost}
+Tianqi Chen and Carlos Guestrin.
+\newblock Xgboost: A scalable tree boosting system.
+\newblock In {\em Proceedings of the 22nd ACM SIGKDD International Conference
+  on Knowledge Discovery and Data Mining}, pages 785--794, 2016.
+
+\bibitem{wang2024timemixer}
+Shiyu Wang, Haixu Wu, Xiaoming Shi, Tengge Hu, Huakun Luo, Lintao Ma, James~Y.
+  Zhang, and Jun Zhou.
+\newblock Timemixer: Decomposable multiscale mixing for time series
+  forecasting.
+\newblock In {\em International Conference on Learning Representations}, 2024.
+
+\bibitem{bai2019ensemble}
+Yun Bai, Bo~Zeng, Chuan Li, and Jin Zhang.
+\newblock An ensemble long short-term memory neural network for hourly pm2.5
+  concentration forecasting.
+\newblock {\em Chemosphere}, 222:286--294, 2019.
+
+\bibitem{beijing2021forecast}
+Sheng Du, Tianrui Li, Yan Yang, and Shih-Wei Horng.
+\newblock Pm2.5 concentrations forecasting in beijing through deep learning
+  with different inputs, model structures and forecast time.
+\newblock {\em Atmospheric Pollution Research}, 12(9):101168, 2021.
+
+\bibitem{nie2023patchtst}
+Yuqi Nie, Nam~H. Nguyen, Phanwadee Sinthong, and Jayant Kalagnanam.
+\newblock A time series is worth 64 words: Long-term forecasting with
+  transformers.
+\newblock In {\em International Conference on Learning Representations}, 2023.
+
+\bibitem{willmott2005mae}
+Cort~J. Willmott and Kenji Matsuura.
+\newblock Advantages of the mean absolute error over the root mean square error
+  in assessing average model performance.
+\newblock {\em Climate Research}, 30:79--82, 2005.
+
+\bibitem{diebold1995accuracy}
+Francis~X. Diebold and Roberto~S. Mariano.
+\newblock Comparing predictive accuracy.
+\newblock {\em Journal of Business \& Economic Statistics}, 13(3):253--263,
+  1995.
+
+\bibitem{newey1987hac}
+Whitney~K. Newey and Kenneth~D. West.
+\newblock A simple, positive semi-definite, heteroskedasticity and
+  autocorrelation consistent covariance matrix.
+\newblock {\em Econometrica}, 55(3):703--708, 1987.
+
+\bibitem{ukair2026my1}
+{Department for Environment, Food and Rural Affairs}.
+\newblock Site information for london marylebone road (uka00315).
+\newblock UK-Air Air Information Resource, 2026.
+\newblock Accessed 5 July 2026.
+
+\bibitem{kamara2021marylebone}
+Adams~A. Kamara and Roy~M. Harrison.
+\newblock Analysis of the air pollution climate of a central urban roadside
+  supersite: London, marylebone road.
+\newblock {\em Atmospheric Environment}, 258:118479, 2021.
+
+\bibitem{lundberg2017shap}
+Scott~M. Lundberg and Su-In Lee.
+\newblock A unified approach to interpreting model predictions.
+\newblock In {\em Advances in Neural Information Processing Systems},
+  volume~30, 2017.
+
+\end{thebibliography}

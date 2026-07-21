@@ -1,0 +1,22 @@
+% Auto-generated from complete multi-station 5-seed results.
+\begin{table*}[tbp]
+\centering
+\caption{Cross-station locked-test MAE, mean (standard deviation) over station--seed runs.}
+\label{tab:multistation-mae}
+\begin{tabular}{lrrrrr}
+\toprule
+Model & 1 h & 6 h & 12 h & 24 h & 48 h \\
+\midrule
+dlinear & 1.390 (0.791) & 3.070 (0.621) & 3.607 (0.558) & 4.014 (0.537) & 4.329 (0.574) \\
+hybrid & 3.519 (0.651) & 4.271 (0.565) & 4.772 (0.501) & 4.908 (0.429) & 5.021 (0.398) \\
+hybrid\_static & 3.771 (0.727) & 4.695 (0.770) & 5.371 (0.853) & 5.377 (0.654) & 5.503 (0.522) \\
+lstm & 1.593 (0.699) & 3.023 (0.555) & 3.564 (0.514) & 3.968 (0.508) & 4.247 (0.534) \\
+persistence & 1.394 (0.816) & 3.324 (0.769) & 4.076 (0.748) & 4.574 (0.655) & 5.251 (0.709) \\
+seasonal\_naive & 4.576 (0.645) & 4.577 (0.648) & 4.574 (0.650) & 4.574 (0.655) & 5.251 (0.709) \\
+timemixer & 3.622 (0.571) & 3.943 (0.535) & 4.152 (0.516) & 4.325 (0.480) & 4.406 (0.504) \\
+xgboost & 1.341 (0.751) & 3.140 (0.576) & 3.804 (0.559) & 4.244 (0.540) & 4.735 (0.519) \\
+\bottomrule
+\end{tabular}
+\end{table*}
+The rolling hybrid won 0 of 25 station--horizon comparisons; its mean relative MAE improvement was -65.23\%.
+These descriptive values require interpretation with station-specific paired tests, high-event metrics, and the pre-specified ablations.
