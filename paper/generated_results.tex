@@ -10,12 +10,30 @@ Model & 1 h & 6 h & 12 h & 24 h & 48 h \\
 dlinear & 1.390 (0.791) & 3.070 (0.621) & 3.607 (0.558) & 4.014 (0.537) & 4.329 (0.574) \\
 hybrid & 2.070 (0.902) & 3.773 (0.519) & 4.075 (0.502) & 4.264 (0.489) & 4.359 (0.472) \\
 hybrid\_static & 2.149 (0.906) & 3.853 (0.531) & 4.144 (0.515) & 4.320 (0.494) & 4.391 (0.460) \\
-\textbf{lstm} & 1.604 (0.708) & \textbf{3.016 (0.578)} & \textbf{3.555 (0.541)} & \textbf{3.959 (0.519)} & \textbf{4.220 (0.536)} \\
+\textbf{LSTM} & 1.604 (0.708) & \textbf{3.016 (0.578)} & \textbf{3.555 (0.541)} & \textbf{3.959 (0.519)} & \textbf{4.220 (0.536)} \\
 persistence & 1.394 (0.816) & 3.324 (0.769) & 4.076 (0.748) & 4.574 (0.655) & 5.251 (0.709) \\
 seasonal\_naive & 4.576 (0.645) & 4.577 (0.648) & 4.574 (0.650) & 4.574 (0.655) & 5.251 (0.709) \\
 timemixer & 3.605 (0.577) & 3.925 (0.540) & 4.146 (0.518) & 4.316 (0.483) & 4.396 (0.469) \\
-\textbf{xgboost} & \textbf{1.341 (0.751)} & 3.140 (0.576) & 3.804 (0.559) & 4.244 (0.540) & 4.735 (0.519) \\
+\textbf{XGBoost} & \textbf{1.341 (0.751)} & 3.140 (0.576) & 3.804 (0.559) & 4.244 (0.540) & 4.735 (0.519) \\
 \bottomrule
 \end{tabular}
 \end{table*}
 The gated rolling hybrid won 0 of 25 matched station--horizon comparisons. Its mean relative MAE improvement against the strongest non-hybrid comparator was -23.33\%.
+
+\begin{table}[tbp]
+\centering
+\caption{Common-history sensitivity for the hybrid model. Values are MAE changes after restricting every station to a 2021-start training history; negative values favor the common-history run.}
+\label{tab:history-sensitivity}
+\begin{tabular}{lrrrr}
+\toprule
+Grouping & Mean $\Delta$MAE & Median $\Delta$MAE & Improved & Worsened \\
+\midrule
+All station--horizon cells & 0.012 & 0.019 & 8 & 17 \\
+1 h horizons & 0.042 & 0.003 & 1 & 4 \\
+6 h horizons & 0.112 & 0.102 & 1 & 4 \\
+12 h horizons & 0.014 & 0.042 & 1 & 4 \\
+24 h horizons & -0.026 & 0.019 & 2 & 3 \\
+48 h horizons & -0.083 & 0.011 & 3 & 2 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,11 +1,1 @@
-The confirmatory experiment completed five stations, five seeds, and a
-30-epoch maximum. Relative to TimeMixer, the gated rolling hybrid reduced
-pooled MAE at all five horizons, with improvements ranging from 0.84\% at 48
-hours to 42.58\% at 1 hour. Calibration gating suppressed 56.8\% of
-station--seed--horizon corrections, substantially limiting the
-over-correction observed in the ungated ablation. Nevertheless, the hybrid
-won 0 of 25 comparisons against the strongest matched non-hybrid comparator;
-its mean relative MAE improvement under that stricter comparison was
--23.33\%. LSTM obtained the lowest pooled MAE (3.271). The results support
-gating as an effective TimeMixer correction safeguard but not a superiority
-or state-of-the-art claim.
+The confirmatory experiment completed five stations, five seeds, and a 30-epoch maximum. The gated rolling hybrid won 0 of 25 station--horizon comparisons, with mean relative MAE improvement of -23.33\% against the strongest matched non-hybrid comparator. The lowest pooled MAE was 3.271, obtained by LSTM. A common-history sensitivity run restricted all stations to a 2021-start history and changed hybrid MAE by only \(+0.012\) on average, supporting the same qualitative conclusion. The result does not support a superiority or state-of-the-art claim.

@@ -245,9 +245,10 @@ KC1 & Urban background & Instrument-regime transition & Retain instrument type a
 
 These differences imply unequal training histories. The primary analysis uses
 each station's legitimately available archive because that reflects the
-operational data available to a forecaster. A separate common-history
-sensitivity runner is included for reviewer checks, but the present
-confirmatory claims use the completed five-station primary run.
+operational data available to a forecaster. A completed common-history
+sensitivity analysis repeats the hybrid evaluation with all stations restricted
+to records available from 2021 onward, so the paper can distinguish genuine
+model behavior from unequal historical depth.
 
 \subsection{Auditable cleaning}
 \label{sec:cleaning}
@@ -475,6 +476,18 @@ calibration-gated static correction, rolling correction, and reduced-feature
 variants. This allows the paper to separate nonlinear residual fit, protection
 against over-correction, and adaptation to recent drift.
 
+The common-history sensitivity check addresses the strongest data-split
+objection. Restricting every station to a 2021-start history changed the
+hybrid MAE by only \(+0.012~\si{\micro\gram\per\cubic\metre}\) on average
+across the 25 station--horizon cells. Eight cells improved and 17 worsened,
+with the median change equal to \(+0.019\). The direction was horizon
+dependent: the common-history run was slightly worse at 1, 6, and 12 hours,
+but slightly better at 24 and 48 hours. HP1 improved the most on average,
+whereas KC1 and MY1 worsened. This sensitivity result supports the main
+interpretation: unequal archive length affects details, but it does not
+reverse the central conclusion that the gated hybrid is a useful TimeMixer
+calibrator rather than the strongest overall forecaster.
+
 The ablation identifies over-correction as the main failure mode of the
 ungated residual learner. At horizons 12, 24, and 48 hours, its pooled MAE was
 6.020, 6.420, and 6.632, respectively. Calibration gating reduced these values
@@ -525,9 +538,10 @@ but it does not remove all dependence. Five UK stations are broader than a
 single-site study but do not establish transfer to unseen industrial,
 suburban, or non-UK environments. Unequal station histories also matter: HP1
 lacks 2016--2018, BIR\_A4540 begins in 2021, CHB has reduced 2024 coverage,
-and KC1 contains an instrument transition. The common-history sensitivity code
-is included to examine this issue, but only completed primary results are used
-for the present claims.
+and KC1 contains an instrument transition. The common-history sensitivity run
+reduces this concern by repeating the comparison with a shared 2021-start
+history, but it is still an internal sensitivity check rather than evidence
+that the model will transfer unchanged to new monitoring networks.
 
 The study is also limited by its PM2.5-only design. Historical concentrations
 do not include forecast-available meteorology, traffic intensity,
@@ -568,7 +582,11 @@ safeguard. However, the hybrid wins 0 of 25 station-horizon comparisons against
 the strongest non-hybrid comparator, and \textbf{LSTM} obtains the best pooled
 MAE overall. The correct conclusion is therefore not that the hybrid is
 state-of-the-art, but that calibrated residual correction can make a multiscale
-neural forecaster safer and more competitive.
+neural forecaster safer and more competitive. The common-history sensitivity
+analysis supports the same interpretation: after restricting all stations to a
+2021-start history, hybrid MAE changed by only \(+0.012\) on average across
+station--horizon cells, so unequal archive length does not explain away the
+primary finding.
 
 For a student AI project, this distinction is valuable. The work does not hide
 negative results; instead, it explains why they occur, identifies the horizons
