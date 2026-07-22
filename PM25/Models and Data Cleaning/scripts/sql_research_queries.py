@@ -102,8 +102,8 @@ def main() -> None:
 
         # RQ2: Does the gated TimeMixer-XGBoost hybrid beat the strongest
         # non-hybrid comparator at each station and horizon?
-        # Positive improvement_percent means the hybrid is better. Negative
-        # values mean the comparator remains better.
+        # mae_gap_percent_vs_best is easier to present than a negative improvement score.
+        # Positive values mean the hybrid is worse than the strongest comparator.
         rq2_sql = """
         SELECT
             station_id,
@@ -113,7 +113,7 @@ def main() -> None:
             ROUND(comparator_mae, 3) AS comparator_mae,
             ROUND(hybrid_mae, 3) AS hybrid_mae,
             ROUND(mae_delta, 3) AS mae_delta,
-            ROUND(improvement_percent, 2) AS improvement_percent,
+            ROUND(-improvement_percent, 2) AS mae_gap_percent_vs_best,
             hybrid_wins
         FROM station_effectiveness
         ORDER BY station_id, horizon;

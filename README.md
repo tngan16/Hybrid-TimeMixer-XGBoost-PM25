@@ -62,8 +62,12 @@ revision:
 - code-generated charts and an editable Draw.io architecture source.
 
 The completed confirmatory run does not support a SOTA claim. The gated hybrid
-improves TimeMixer at all pooled horizons, but wins 0/25 comparisons against
-the strongest matched comparator. See `docs/sota_claim_policy.md`.
+improves the compact TimeMixer base at all pooled horizons, but wins 0/25
+comparisons against the strongest matched comparator and has a 23.33% average
+MAE gap. The project should therefore be presented as a leakage-safe negative
+finding plus a residual-gating lesson: simple baselines remain hard to beat,
+and residual correction should first be tested on a strong base forecaster. See
+`docs/sota_claim_policy.md` and `docs/presentation_defense_notes.md`.
 
 ### Added reviewer station datasets
 

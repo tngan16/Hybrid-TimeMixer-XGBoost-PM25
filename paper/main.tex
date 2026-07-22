@@ -109,64 +109,55 @@ locked-test eras. \input{generated_abstract.tex}}
 \section{Introduction}
 \label{sec:intro}
 
-Fine particulate matter (\(\PM\)) is a central air-quality indicator because
-long-term and short-term exposure is associated with respiratory and
-cardiovascular risk \cite{who2021aqg}. For city operators and public-facing
+Fine particulate matter (\(\PM\)) is a central air-quality indicator linked to
+respiratory and cardiovascular risk \cite{who2021aqg}. For operators and public
 dashboards, the useful question is not only whether pollution is high now, but
-whether it is likely to remain high over the next few hours or days. This
-study addresses that operational setting through multi-horizon hourly
-forecasting at 1, 6, 12, 24, and 48 hours.
+whether it will remain high over the next few hours or days. This study targets
+hourly forecasts at 1, 6, 12, 24, and 48 hours.
 
-Historical \(\PM\) forecasting is difficult for three connected reasons.
-First, the signal is strongly persistent at short horizons, but persistence
-weakens when the lead time increases. Second, daily and weekly cycles coexist
-with abrupt pollution episodes, producing a mixture of smooth temporal
-structure and sharp residual errors. Third, monitoring archives are imperfect:
-they contain missing observations, long outages, negative source values, and
-instrument-regime changes. A model can appear accurate if these problems are
-silently interpolated or split randomly across training and test sets.
+Historical \(\PM\) forecasting is difficult because short-horizon persistence,
+daily/weekly cycles, abrupt episodes, and imperfect monitoring archives occur
+together. Missing observations, long outages, negative source values, and
+instrument changes can make a model appear accurate if they are silently
+interpolated or split randomly across training and test sets.
 
-The paper therefore evaluates a leakage-controlled, auditable forecasting
-pipeline rather than only a model architecture. The proposed model uses
-\TM{} as a multiscale base forecaster and \XGB{} as a horizon-specific
-residual corrector. The residual layer is deliberately conservative: it removes
-calibration-period median bias, trains with pseudo-Huber loss, clips extreme
-corrections, selects a non-negative gate on a held-out calibration subset, and
-updates recent bias through rolling calibration using only errors observable at
-the forecast origin. This design asks a practical question: can a boosted
-residual layer improve a neural multiscale forecaster without creating
-unstable over-correction?
+The paper therefore evaluates a leakage-controlled pipeline, not only a model
+architecture. The proposed model uses \TM{} as a compact multiscale base and
+\XGB{} as a horizon-specific residual corrector. Its conservative residual layer
+removes median bias, uses pseudo-Huber loss, clips extreme corrections, selects
+a non-negative held-out gate, and updates recent bias only from origin-available
+errors. The practical question is whether boosted residual correction can help a
+neural forecaster without creating unstable over-correction.
 
-The empirical study uses five UK-Air stations representing urban traffic,
-urban background, and rural background environments. All experiments use the
-same chronological partitions, origin-safe features, five random seeds, and a
-30-epoch maximum for neural models. The final results are intentionally
-reported against two standards. The first asks whether the gated residual layer
-improves the \TM{} base. The second, stricter standard asks whether the hybrid
-beats the strongest non-hybrid comparator at each station and horizon. This
-distinction is important: the proposed correction is useful as a safeguard for
-\TM{}, but it does not support a state-of-the-art claim against the best
-baseline in this dataset.
+The empirical study uses five UK-Air stations across urban traffic, urban
+background, and rural background settings. All experiments share chronological
+partitions, origin-safe features, five seeds, and a 30-epoch neural budget. The
+results are read against two standards: whether gating improves the compact
+\TM{} base, and whether the hybrid beats the strongest matched comparator. The
+experiment supports the first claim, but not the second.
 
-The contributions are threefold. First, the study provides a reproducible
-PM2.5-only pipeline that records cleaning decisions instead of hiding them
-inside preprocessing. Second, it tests a conservative residual-correction
-design that can abstain when calibration evidence does not support adjustment.
-Third, it reports both positive and negative evidence, making clear where the
-hybrid helps, where simpler or recurrent baselines remain stronger, and why
-future improvement should focus on base-model strength and external drivers.
+This framing is important for a student research project because air-quality
+forecasting can look successful if the comparison set is too weak. A model that
+beats only seasonal-naive forecasts may still be less useful than a direct tree
+model or a simple recurrent network. The study therefore treats persistence,
+XGBoost, DLinear, and LSTM as serious competitors rather than background
+baselines. It also reports station-specific data problems before modeling, so
+negative source values, incomplete coverage, and instrument changes are not
+hidden behind a single accuracy number.
+
+The contributions are threefold: an auditable PM2.5-only pipeline, a
+conservative residual-correction design that can abstain, and a transparent
+negative finding showing that simple/recurrent baselines remain stronger while
+gating teaches when hybrid correction should back off.
 
 \section{Related Work}
 \label{sec:related}
 
-Classical forecasting methods remain relevant because air-quality time series
-contain persistence and calendar structure that simple baselines can exploit
-\cite{hyndman2021fpp3}. Persistence and seasonal-naive forecasts are therefore
-not placeholders; at short horizons, they are often hard to beat. For PM2.5
-specifically, previous studies show that model ranking varies with input
-variables, architecture, and forecast lead time \cite{beijing2021forecast}.
-This motivates horizon-by-horizon reporting rather than a single averaged
-score.
+Classical methods remain relevant because air-quality series contain
+persistence and calendar structure \cite{hyndman2021fpp3}. Persistence and
+seasonal-naive forecasts are therefore real baselines, especially at short
+horizons. PM2.5 studies also show that rankings vary with inputs, architecture,
+and lead time \cite{beijing2021forecast}, motivating horizon-wise reporting.
 
 Neural sequence models provide stronger nonlinear temporal representations.
 LSTM is a common recurrent baseline for hourly PM2.5 forecasting
@@ -179,29 +170,29 @@ Transformers \cite{lim2021temporal}, and TimeMixer
 mixes information across downsampled temporal scales, which matches the
 coexistence of short-lag persistence and slower pollution cycles.
 
-Tree ensembles offer a different advantage. XGBoost models nonlinear
-interactions among lagged values, rolling statistics, calendar variables, and
-measurement-regime indicators while remaining efficient on tabular features
-\cite{chen2016xgboost}. Related gradient-boosting systems such as LightGBM
-show the value of histogram-based tree learning for structured prediction
-\cite{ke2017lightgbm}. In this paper, XGBoost is not used to replace the
-sequence model; it is used to correct residual errors that remain after
-TimeMixer. This follows the broader direct multi-step forecasting idea that
-different lead times can require different error models
+Tree ensembles offer a complementary advantage. XGBoost efficiently models
+interactions among lags, rolling statistics, calendar variables, and
+measurement-regime indicators \cite{chen2016xgboost}; related systems such as
+LightGBM show the strength of boosted trees on structured data
+\cite{ke2017lightgbm}. Here, XGBoost corrects TimeMixer residuals under the
+direct multi-step view that different horizons may need different error models
 \cite{taieb2012review}.
 
-Evaluation must also respect the time-series structure. Random cross-validation
-can leak near-duplicate temporal contexts across train and test splits
-\cite{bergmeir2018cv}. The study therefore uses chronological partitions,
-origin-safe feature construction, MAE as the primary metric
-\cite{willmott2005mae}, and paired evidence for dependent forecast errors
-\cite{diebold1995accuracy,newey1987hac}. SHAP summaries are used only as
-predictive diagnostics, not causal explanations \cite{lundberg2017shap}.
-This evaluation framing is especially important for hybrid models. If the
-residual learner is tuned on the same period used for final testing, it can
-appear to improve the base forecaster while actually learning test-specific
-bias. For that reason, this paper separates neural validation, residual
-fitting, gate selection, and locked testing into distinct chronological eras.
+Evaluation must respect temporal dependence: random splits can leak
+near-duplicate contexts across train and test \cite{bergmeir2018cv}. This study
+therefore uses chronological partitions, origin-safe features, MAE
+\cite{willmott2005mae}, paired evidence \cite{diebold1995accuracy,newey1987hac},
+and SHAP only as predictive diagnostics \cite{lundberg2017shap}. Because
+residual tuning can otherwise learn test-specific bias, neural validation,
+residual fitting, gate selection, and locked testing are separated.
+
+A further issue in hybrid forecasting is that residual learners can easily
+overfit the remaining error of a base model. If the base forecast is already
+biased or noisy, a second-stage learner may amplify rather than correct the
+mistake. This motivates the conservative design used in this paper: residual
+correction is treated as optional calibration, not as an automatic performance
+boost. The gate is selected on calibration data only, and the model is allowed
+to return to the original TimeMixer forecast when correction evidence is weak.
 
 \section{Method}
 \label{sec:method}
@@ -258,21 +249,16 @@ KC1 & Urban background & Instrument-regime transition & Retain instrument type a
 \end{table}
 
 These differences imply unequal training histories. The primary analysis uses
-each station's legitimately available archive because that reflects the
-operational data available to a forecaster. A completed common-history
-sensitivity analysis repeats the hybrid evaluation with all stations restricted
-to records available from 2021 onward, so the paper can distinguish genuine
-model behavior from unequal historical depth.
+each station's available archive, while a common-history sensitivity run
+restricts all stations to records from 2021 onward.
 
 \subsection{Auditable cleaning}
 \label{sec:cleaning}
 
-The raw file is immutable. Cleaning creates three concentration concepts:
-\emph{raw} values preserve source evidence, \emph{observed} values contain
-numeric non-negative measurements, and \emph{clean} values add only approved
-short-gap interpolation. Each row carries flags for invalid timestamps,
-missing or non-numeric source values, negative values, duplicate timestamps,
-inserted hourly-grid rows, interpolation, and preserved long gaps.
+The raw file is immutable. Cleaning separates \emph{raw} source evidence,
+\emph{observed} non-negative measurements, and \emph{clean} values with only
+approved short-gap interpolation. Row flags record invalid timestamps, missing
+or negative values, duplicates, inserted grid rows, interpolation, and long gaps.
 
 Linear interpolation is allowed only for internal gaps no longer than three
 hours. Longer gaps remain missing, and any model window crossing unresolved
@@ -303,13 +289,10 @@ Primary short-gap interpolation limit & 3 h \\
 \subsection{Origin-safe predictors}
 \label{sec:originsafe}
 
-Calendar predictors contain hour, day of week, month, weekend status, and
-sine/cosine encodings. Direct XGBoost uses PM2.5 lags at 1, 2, 3, 6, 12, 24,
-48, 72, and 168 hours, shifted rolling summaries over 3 to 168 hours,
-differences, cyclic calendar variables, and instrument type. Every rolling
-summary is computed after a one-hour shift, so a feature attached to origin
-\(t\) contains values no later than \(t-1\). The current value \(y_t\) remains
-available as the last element of the 168-hour sequence.
+Predictors include calendar encodings, PM2.5 lags at 1--168 hours, shifted
+rolling summaries, differences, and instrument type. Every rolling summary is
+shifted by one hour, so features at origin \(t\) contain values no later than
+\(t-1\); \(y_t\) remains available as the last sequence value.
 
 Rather than presenting origin safety as a formal theorem, we enforce it as a core pipeline rule. All sequence, lag, rolling, calendar, instrument, and missingness features must be available by the forecast origin \(t\). In contrast, target values must occur strictly after \(t\) and remain within their designated chronological partition.
  This matters because multi-horizon windows
@@ -320,14 +303,10 @@ set available at deployment.
 \subsection{SQL-style and Python analysis}
 \label{sec:query-analysis}
 
-All descriptive and modelling evidence is generated from reproducible Python
-scripts, while the reported comparisons are organized as SQL-style grouped
-queries over station, horizon, model, seed, and experiment setting. This query
-logic directly matches the research questions: model-ranking summaries answer
-RQ1, TimeMixer-versus-hybrid joins answer RQ2, and available-history versus
-common-2021 joins answer RQ3. The exported CSV tables are therefore not only
-intermediate files for plotting; they are auditable analytical outputs that
-connect preprocessing, visualisation, dashboard panels, and final claims.
+Python scripts generate the evidence, and SQL-style grouped queries organize
+comparisons by station, horizon, model, seed, and experiment setting. Model
+ranking answers RQ1, TimeMixer-versus-hybrid joins answer RQ2, and
+available-history versus common-2021 joins answer RQ3.
 
 \subsection{Forecasting task}
 \label{sec:problem}
@@ -423,9 +402,12 @@ or non-numeric readings, 238 negative values, and a 1,656-hour maximum invalid
 run. Cross-station auditing reveals additional heterogeneity: HP1 contains no
 observations in 2016-2018; BIR\_A4540 begins in 2021; CHB has only 73.44\%
 coverage in 2024 and contains 561 negative source values; and KC1 contains an
-instrument-regime transition. None of these intervals or negative values is
-reconstructed through long-range interpolation. Instead, invalid values
-remain auditable and forecast windows crossing unresolved gaps are excluded.
+instrument-regime transition. Negative PM2.5 concentrations are not interpreted as physical pollution
+levels; they are treated as invalid source readings, masked from the modelling
+target, and retained only as audit evidence. None of these intervals or invalid
+values is reconstructed through long-range interpolation. Instead, invalid
+values remain auditable and forecast windows crossing unresolved gaps are
+excluded.
 
 \IfFileExists{figures/01_data_overview.png}{
 \begin{figure}[!t]
@@ -465,56 +447,46 @@ Figure~\ref{fig:multistation} is the main effectiveness figure. It shows that
 the hybrid does not beat the strongest comparator in any of the 25
 station-horizon cells. The result exporter accepts only complete gated-v2 runs
 covering all five stations, seeds 0--4, and the 30-epoch configuration, so the
-reported comparison is not based on a cherry-picked single run.
+reported comparison is not based on a cherry-picked single run. The paper
+therefore avoids the phrase ``negative improvement'' in the main interpretation
+and reports the result as an MAE gap against stronger baselines.
 
 \IfFileExists{generated_results.tex}{\input{generated_results.tex}}{}
 
-The same result files also drive the submitted interactive dashboard. The
-application is intentionally a research explorer rather than a live warning
-service: it presents station data quality, grouped model metrics, residual
-gate behaviour, generated figures, and static explanation panels from the
-completed experiment artifacts. This makes the paper's numerical claims
-traceable to the repository outputs used in the presentation and prototype.
+The same result files drive the dashboard, which is a research explorer rather
+than a live warning service. It exposes station quality, grouped metrics,
+residual gates, figures, and explanation panels from completed artifacts.
 
 Table~\ref{tab:multistation-mae} explains which models are strongest by
-horizon. \textbf{XGBoost} is strongest at 1 hour, while \textbf{LSTM} is
-strongest from 6 to 48 hours. The hybrid improves its intended TimeMixer base
-at every horizon, reducing pooled MAE by 42.58\% at 1 hour and by smaller but
-positive margins from 6 to 48 hours. However, this is a narrower result than
-overall superiority: the hybrid pooled MAE is 3.708, compared with 4.078 for
-TimeMixer and \textbf{3.271 for LSTM}.
+horizon. \textbf{XGBoost} is strongest at 1 hour, while LSTM and DLinear are
+the strongest longer-horizon pair. The difference between their pooled MAE is
+only 0.011, so the paper treats them as practically tied rather than crowning
+one model from a tiny point estimate. The hybrid improves its intended
+TimeMixer base at every horizon, reducing pooled MAE by 42.58\% at 1 hour and
+by smaller positive margins from 6 to 48 hours. However, this is a narrower
+result than overall superiority: the hybrid pooled MAE is 3.708, compared with
+4.078 for TimeMixer, 3.282 for DLinear, and 3.271 for LSTM.
 
-The ablation study is intentionally same-origin and chronological. It
-distinguishes the TimeMixer base, ungated robust correction,
-calibration-gated static correction, rolling correction, and reduced-feature
-variants. This allows the paper to separate nonlinear residual fit, protection
-against over-correction, and adaptation to recent drift.
+The same-origin ablation separates the TimeMixer base, ungated correction,
+static gating, rolling calibration, and reduced-feature variants, isolating
+residual fit, over-correction protection, and recent-drift adaptation.
 
-The common-history sensitivity check addresses the strongest data-split
-objection. Restricting every station to a 2021-start history changed the
-hybrid MAE by only \(+0.012~\si{\micro\gram\per\cubic\metre}\) on average
-across the 25 station--horizon cells. Eight cells improved and 17 worsened,
-with the median change equal to \(+0.019\). The direction was horizon
-dependent: the common-history run was slightly worse at 1, 6, and 12 hours,
-but slightly better at 24 and 48 hours. HP1 improved the most on average,
-whereas KC1 and MY1 worsened. This sensitivity result supports the main
-interpretation: unequal archive length affects details, but it does not
-reverse the central conclusion that the gated hybrid is a useful TimeMixer
-calibrator rather than the strongest overall forecaster.
+The common-history sensitivity check addresses unequal archive length.
+Restricting every station to a 2021-start history changed hybrid MAE by only
+\(+0.012~\si{\micro\gram\per\cubic\metre}\) on average across 25 cells: eight
+improved and 17 worsened. This changes details but not the conclusion that the
+gated hybrid is a TimeMixer calibrator rather than the strongest forecaster.
 
-The ablation identifies over-correction as the main failure mode of the
-ungated residual learner. At horizons 12, 24, and 48 hours, its pooled MAE was
-6.020, 6.420, and 6.632, respectively. Calibration gating reduced these values
-to 4.144, 4.320, and 4.391, and rolling calibration further reduced them to
-4.075, 4.264, and 4.359. The gate selected zero correction in 56.8\% of all
-station-seed-horizon fits. Mean gate weight was 0.930 at 1 hour but no more
-than 0.158 at longer horizons, showing that strong residual correction was
-supported primarily at short lead time.
+The ablation identifies over-correction as the ungated learner's main failure
+mode. At 12, 24, and 48 hours, ungated MAE reached 6.020, 6.420, and 6.632;
+gating reduced them to 4.144, 4.320, and 4.391, with rolling calibration
+further reducing them to 4.075, 4.264, and 4.359. The gate selected zero
+correction in 56.8\% of fits, so strong correction was supported mainly at short
+lead time.
 
-SHAP and bootstrap diagnostics are retained in the supplementary generated
-figures rather than the main text. This avoids repeating the same message with
-several plot types: the residual layer improves TimeMixer after gating, but it
-does not become the best overall forecaster.
+Secondary metrics and bootstrap evidence support the negative finding: RMSE
+and sMAPE favor DLinear/LSTM, while paired bootstrap supports only the narrower
+claim that gating improves compact TimeMixer. SHAP remains supplementary.
 \FloatBarrier
 
 \section{Discussion}
@@ -525,55 +497,57 @@ does not become the best overall forecaster.
 \subsection{Interpretation of effectiveness}
 \label{sec:discussion-interpretation}
 
-The results explain both why the proposed method is reasonable and why it is
-not yet globally effective. The TimeMixer base captures multiscale temporal
-structure, but its residuals are not equally learnable at all horizons. At 1
-hour, recent lag information remains highly informative, so the residual gate
-often permits a large correction. At longer horizons, the gate usually shrinks
-toward zero because residual predictions become less reliable. This behavior
-is desirable: a residual model that is allowed to correct every forecast can
-produce large negative transfer, as shown by the ungated ablation.
+The compact TimeMixer base is weaker than persistence in pooled MAE, so
+improving it should not be confused with proving a strong hybrid. At 1 hour,
+recent lags support large residual corrections; at longer horizons, the gate
+shrinks toward zero as residual predictions become less reliable. This is
+useful because unconstrained residual correction caused large negative transfer.
+The result also explains why the revised paper avoids a state-of-the-art claim:
+the hybrid mechanism is effective as a safety layer over TimeMixer, but the
+complete forecasting system is not yet the best model for deployment.
 
 The strongest competing models also clarify the limitation. \textbf{XGBoost}
 is best at 1 hour because origin-available lags and rolling statistics almost
-directly describe the next-hour state. \textbf{LSTM} is best at longer
-horizons because it learns a smoother sequence representation than the compact
-TimeMixer implementation used here. In other words, the residual layer repairs
-some TimeMixer errors, but it cannot fully compensate for a weaker base
-trajectory. The method is therefore best interpreted as a calibrated residual
-safeguard rather than a new state-of-the-art forecaster.
+directly describe the next-hour state. LSTM and DLinear are nearly tied overall,
+which is a useful result in itself: a simple linear decomposition model remains
+competitive with a recurrent neural model and both outperform the present
+hybrid. In other words, the residual layer repairs some TimeMixer errors, but
+it cannot fully compensate for a weak base trajectory. The method is therefore
+best interpreted as a controlled residual-calibration lesson rather than a new
+state-of-the-art forecaster.
+
+From an application perspective, this is still a useful outcome. A forecasting
+system used in environmental monitoring should prefer stable, explainable
+performance over architectural novelty. The gated residual layer shows a
+practical safeguard: when the calibration set indicates that the residual model
+is unreliable, the correction is reduced or disabled. This behavior is easier
+to defend than an ungated stacked model that occasionally improves average
+scores but produces large horizon-specific failures. The analysis therefore
+connects model design with operational reliability, which is one reason the
+paper keeps both model-performance tables and data-quality diagnostics in the
+main text.
 
 \subsection{Limitations}
 \label{sec:discussion-limitations}
 
-Several threats remain. Overlapping forecast windows create serial dependence,
-so paired block evidence is more appropriate than independent-sample tests,
-but it does not remove all dependence. Five UK stations are broader than a
-single-site study but do not establish transfer to unseen industrial,
-suburban, or non-UK environments. Unequal station histories also matter: HP1
-lacks 2016--2018, BIR\_A4540 begins in 2021, CHB has reduced 2024 coverage,
-and KC1 contains an instrument transition. The common-history sensitivity run
-reduces this concern by repeating the comparison with a shared 2021-start
-history, but it is still an internal sensitivity check rather than evidence
-that the model will transfer unchanged to new monitoring networks.
+Several threats remain. Overlapping windows create serial dependence, five UK
+stations do not prove transfer to unseen networks, and station histories differ
+(HP1 lacks 2016--2018, BIR\_A4540 begins in 2021, CHB has reduced 2024 coverage,
+and KC1 changes instrument regime). The common-history run reduces but does not
+eliminate this concern.
 
-The study is also limited by its PM2.5-only design. Historical concentrations
-do not include forecast-available meteorology, traffic intensity,
-co-pollutants, transport patterns, or local event information. These omitted
-drivers are likely important during abrupt pollution episodes. Finally,
-instrument indicators are useful regime markers but should not be interpreted
-as causal explanations of pollution concentration.
+The PM2.5-only design also omits forecast-available meteorology, traffic,
+co-pollutants, transport patterns, and local events, all of which may matter
+during abrupt episodes. Instrument indicators are regime markers, not causal
+explanations.
 
 \subsection{Future work}
 \label{sec:discussion-future}
 
-Future work should therefore test stronger base forecasters, add only
-variables known at the forecast origin, evaluate leave-one-station-out
-transfer, and use regime-specific calibration for instrument changes and
-seasonal drift. A useful next experiment is to compare the PM2.5-only setting
-with a meteorology-assisted setting under the same locked-test protocol. The
-workflow should still preserve raw audit fields, abstain across unresolved
-long gaps, and keep the locked test independent of model tuning.
+Future work should test stronger base forecasters, add only origin-available
+external variables, evaluate leave-one-station-out transfer, and compare the
+PM2.5-only setting with meteorology-assisted variants under the same locked-test
+protocol.
 
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
@@ -589,35 +563,30 @@ under chronological training, validation, calibration, and locked-test
 partitions.
 
 The main result is mixed but informative. The gated residual layer improves
-the TimeMixer base at every horizon and greatly reduces the over-correction
-seen in ungated residual learning. This supports the proposed de-biasing,
-robust loss, held-out gating, and rolling calibration strategy as a useful
-safeguard. However, the hybrid wins 0 of 25 station-horizon comparisons against
-the strongest non-hybrid comparator, and \textbf{LSTM} obtains the best pooled
-MAE overall. The correct conclusion is therefore not that the hybrid is
-state-of-the-art, but that calibrated residual correction can make a multiscale
-neural forecaster safer and more competitive. The common-history sensitivity
-analysis supports the same interpretation: after restricting all stations to a
-2021-start history, hybrid MAE changed by only \(+0.012\) on average across
-station--horizon cells, so unequal archive length does not explain away the
-primary finding.
+the compact TimeMixer base at every horizon and greatly reduces the
+over-correction seen in ungated residual learning. However, the compact
+TimeMixer base is weaker than persistence in pooled MAE, so this improvement
+mainly shows that the gate can rescue a weak base, not that the complete hybrid
+is superior. The hybrid wins 0 of 25 station-horizon comparisons against the
+strongest non-hybrid comparator and has a 23.33\% average MAE gap against that
+comparator. LSTM and DLinear are practically tied as the strongest pooled
+baselines. The common-history sensitivity analysis supports the same
+interpretation: after restricting all stations to a 2021-start history, hybrid
+MAE changed by only \(+0.012\) on average across station--horizon cells, so
+unequal archive length does not explain away the primary finding.
 
-For a student AI project, this distinction is valuable. The work does not hide
-negative results; instead, it explains why they occur, identifies the horizons
-where residual correction is most useful, and leaves a reproducible path for
-future improvement. The next step is to strengthen the base forecaster and add
-forecast-available external drivers while keeping the same leakage-safe
-evaluation protocol. Future research should compare the PM2.5-only setting
-with meteorology-assisted variants, test leave-one-station-out transfer, and
-study regime-specific calibration for stations with instrument transitions.
-The dashboard can also be extended from an artifact explorer into a deployed
-monitoring tool once live data ingestion and retraining safeguards are added.
+For a student AI project, this distinction is valuable: the work shows that
+simple baselines are competitive, ungated residual stacking can damage
+forecasts, and held-out gating is needed when residual evidence is weak. The
+next step is to strengthen the base forecaster, add origin-available external
+drivers, and test transfer while keeping the same leakage-safe protocol. The
+dashboard can later move from artifact explorer to deployed monitoring tool.
 
-Overall, the study shows that a hybrid architecture should be judged not by
-whether it sounds more advanced, but by whether each added component improves
-out-of-sample behavior under fair comparison. In this dataset, the gated
-residual layer is justified as a controlled calibration mechanism, while LSTM
-and XGBoost remain important reference points for future model development.
+Overall, a hybrid architecture should be judged by out-of-sample behavior, not
+by complexity. Here, the honest contribution is a leakage-safe negative result
+plus a residual-gating lesson: simple baselines remain hard to beat, and a
+residual hybrid should first prove that its base forecaster is strong enough to
+deserve calibration.
 
 \section*{Data and Code Availability}
 The repository contains data-processing and modeling code, tests, figures,
