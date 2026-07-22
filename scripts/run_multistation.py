@@ -1,4 +1,13 @@
-"""Run the pre-specified 5-seed/30-epoch protocol for user-supplied stations."""
+"""Run the pre-specified 5-seed/30-epoch protocol for user-supplied stations.
+
+Research-question links:
+    RQ1: Which model forecasts hourly PM2.5 most accurately by station/horizon?
+    RQ2: Does the gated TimeMixer-XGBoost hybrid beat the strongest comparator?
+
+The code below answers these RQs with pandas SQL-style operations:
+GROUP BY station/model/horizon, filter comparators, JOIN hybrid results, and
+compute the improvement percentage.
+"""
 import argparse
 import json
 import sys
@@ -13,18 +22,34 @@ from pm25forecast.pipeline import run_experiment
 
 
 def effectiveness(frame):
+    """Answer RQ1 and RQ2 with pandas query-style aggregation.
+
+    Equivalent SQL logic:
+        1. GROUP BY station_id, site_type, model, horizon to compute mean MAE.
+        2. WHERE model NOT IN ('hybrid', 'hybrid_static') to define baselines.
+        3. Pick the minimum-MAE comparator for each station and horizon.
+        4. JOIN with the gated hybrid row.
+        5. Compute MAE delta, improvement percentage, and win/loss flag.
+    """
+    # RQ1: aggregate model performance by station, site type, model, and horizon.
     means=(frame.groupby(["station_id","site_type","model","horizon"],
                          as_index=False).MAE.mean())
+
+    # RQ1: find the strongest non-hybrid comparator in each station-horizon cell.
     comparator=means.loc[~means.model.isin(["hybrid","hybrid_static"])]
     index=comparator.groupby(["station_id","horizon"]).MAE.idxmin()
     best=comparator.loc[index,["station_id","horizon","model","MAE"]].rename(
         columns={"model":"best_comparator","MAE":"comparator_mae"}
     )
+
+    # RQ2: join the proposed gated hybrid against that strongest comparator.
     hybrid=means.loc[means.model.eq("hybrid"),
                      ["station_id","site_type","horizon","MAE"]].rename(
         columns={"MAE":"hybrid_mae"}
     )
     out=hybrid.merge(best,on=["station_id","horizon"],how="left")
+
+    # RQ2: positive improvement means the hybrid beats the comparator.
     out["mae_delta"]=out.hybrid_mae-out.comparator_mae
     out["improvement_percent"]=(
         100*(out.comparator_mae-out.hybrid_mae)/out.comparator_mae

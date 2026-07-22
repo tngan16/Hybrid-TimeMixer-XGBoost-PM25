@@ -306,6 +306,18 @@ overlap heavily. A random split would place nearly identical contexts on both
 sides of a boundary, whereas chronological partitions preserve the information
 set available at deployment.
 
+\subsection{SQL-style and Python analysis}
+\label{sec:query-analysis}
+
+All descriptive and modelling evidence is generated from reproducible Python
+scripts, while the reported comparisons are organized as SQL-style grouped
+queries over station, horizon, model, seed, and experiment setting. This query
+logic directly matches the research questions: model-ranking summaries answer
+RQ1, TimeMixer-versus-hybrid joins answer RQ2, and available-history versus
+common-2021 joins answer RQ3. The exported CSV tables are therefore not only
+intermediate files for plotting; they are auditable analytical outputs that
+connect preprocessing, visualisation, dashboard panels, and final claims.
+
 \subsection{Forecasting task}
 \label{sec:problem}
 
@@ -462,6 +474,13 @@ reported comparison is not based on a cherry-picked single run.
 
 \IfFileExists{generated_results.tex}{\input{generated_results.tex}}{}
 
+The same result files also drive the submitted interactive dashboard. The
+application is intentionally a research explorer rather than a live warning
+service: it presents station data quality, grouped model metrics, residual
+gate behaviour, generated figures, and static explanation panels from the
+completed experiment artifacts. This makes the paper's numerical claims
+traceable to the repository outputs used in the presentation and prototype.
+
 Table~\ref{tab:multistation-mae} explains which models are strongest by
 horizon. \textbf{XGBoost} is strongest at 1 hour, while \textbf{LSTM} is
 strongest from 6 to 48 hours. The hybrid improves its intended TimeMixer base
@@ -561,7 +580,7 @@ with a meteorology-assisted setting under the same locked-test protocol. The
 workflow should still preserve raw audit fields, abstain across unresolved
 long gaps, and keep the locked test independent of model tuning.
 
-\section{Conclusion}
+\section{Conclusion and Future Work}
 \label{sec:conclusion}
 
 This paper evaluated a gated TimeMixer-XGBoost approach for multi-horizon
@@ -593,7 +612,11 @@ negative results; instead, it explains why they occur, identifies the horizons
 where residual correction is most useful, and leaves a reproducible path for
 future improvement. The next step is to strengthen the base forecaster and add
 forecast-available external drivers while keeping the same leakage-safe
-evaluation protocol.
+evaluation protocol. Future research should compare the PM2.5-only setting
+with meteorology-assisted variants, test leave-one-station-out transfer, and
+study regime-specific calibration for stations with instrument transitions.
+The dashboard can also be extended from an artifact explorer into a deployed
+monitoring tool once live data ingestion and retraining safeguards are added.
 
 Overall, the study shows that a hybrid architecture should be judged not by
 whether it sounds more advanced, but by whether each added component improves

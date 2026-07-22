@@ -17,6 +17,7 @@
 \usepackage{orcidlink}
 
 \geometry{a4paper,left=4cm,right=4cm,top=2.45cm,bottom=2.45cm}
+\raggedbottom
 
 \graphicspath{{figures/}{../figures/}}
 \setkeys{Gin}{draft=false}
@@ -28,6 +29,12 @@
 \setlength{\dblfloatsep}{5pt plus 2pt minus 2pt}
 \setlength{\abovecaptionskip}{4pt}
 \setlength{\belowcaptionskip}{2pt}
+\AtBeginDocument{%
+  \setlength{\abovedisplayskip}{4pt plus 1pt minus 1pt}%
+  \setlength{\belowdisplayskip}{4pt plus 1pt minus 1pt}%
+  \setlength{\abovedisplayshortskip}{3pt plus 1pt minus 1pt}%
+  \setlength{\belowdisplayshortskip}{3pt plus 1pt minus 1pt}%
+}
 
 \definecolor{pmred}{HTML}{E4572E}
 \definecolor{tmblue}{HTML}{2E86AB}
@@ -204,6 +211,15 @@ multi-horizon neural forecasting, residual calibration, and locked evaluation.
 The goal is to preserve the evidence trail from raw monitoring records while
 preventing future information from entering model inputs.
 
+\begin{figure}[!t]
+\vspace{-4pt}
+\centering
+\includegraphics[draft=false,width=0.62\linewidth]{00_framework.png}
+\caption{End-to-end framework: TimeMixer generates base forecasts, and a later calibration interval fits and gates residual XGBoost before locked testing.}
+\vspace{-8pt}
+\label{fig:framework}
+\end{figure}
+
 \subsection{Data and monitoring stations}
 \label{sec:site}
 
@@ -219,9 +235,7 @@ independently with the same schema, cleaning rules, forecast horizons,
 chronological boundaries, seeds, and evaluation metrics. Dataset paths and
 site types are fixed in \texttt{data/stations.csv}.
 
-UK-Air exports separate date and hour-ending time fields. During ingestion,
-the pipeline preserves source filename, source row identity, raw timestamp
-text, raw concentration text, and status metadata. A source time of 24:00 is
+UK-Air provides the date and hour-ending time in separate fields. During ingestion, the pipeline combines these fields while retaining the original filename, row identifier, timestamp and concentration values, along with the associated status information. A source time of 24:00 is
 normalized to 00:00 of the following day. The target is hourly PM2.5 mass
 concentration in \si{\micro\gram\per\cubic\meter}.
 
@@ -297,14 +311,23 @@ summary is computed after a one-hour shift, so a feature attached to origin
 \(t\) contains values no later than \(t-1\). The current value \(y_t\) remains
 available as the last element of the 168-hour sequence.
 
-This origin-safety rule is treated as a pipeline invariant rather than a
-theorem in the main text: every sequence, lag, rolling, calendar, instrument,
-and missingness predictor must be measurable at or before forecast origin
-\(t\), while every target must be strictly after \(t\) and remain inside its
-assigned chronological partition. This matters because multi-horizon windows
+Rather than presenting origin safety as a formal theorem, we enforce it as a core pipeline rule. All sequence, lag, rolling, calendar, instrument, and missingness features must be available by the forecast origin \(t\). In contrast, target values must occur strictly after \(t\) and remain within their designated chronological partition.
+ This matters because multi-horizon windows
 overlap heavily. A random split would place nearly identical contexts on both
 sides of a boundary, whereas chronological partitions preserve the information
 set available at deployment.
+
+\subsection{SQL-style and Python analysis}
+\label{sec:query-analysis}
+
+All descriptive and modelling evidence is generated from reproducible Python
+scripts, while the reported comparisons are organized as SQL-style grouped
+queries over station, horizon, model, seed, and experiment setting. This query
+logic directly matches the research questions: model-ranking summaries answer
+RQ1, TimeMixer-versus-hybrid joins answer RQ2, and available-history versus
+common-2021 joins answer RQ3. The exported CSV tables are therefore not only
+intermediate files for plotting; they are auditable analytical outputs that
+connect preprocessing, visualisation, dashboard panels, and final claims.
 
 \subsection{Forecasting task}
 \label{sec:problem}
@@ -324,24 +347,22 @@ correction function per horizon.
 \subsection{TimeMixer base forecaster}
 \label{sec:timemixer}
 
-The implementation is a compact research adaptation of the multiscale ideas in
-TimeMixer rather than a line-for-line reproduction of the official benchmark
-code \cite{wang2024timemixer}. The input sequence is downsampled at several
-scales, each scale is decomposed into smooth and residual components, and MLP
-mixing blocks combine information across scale and feature dimensions. A
-linear head produces the five horizon forecasts, and the learned multiscale
-embedding is reused by the residual XGBoost stage. Huber loss, AdamW
-optimization, gradient clipping, and early stopping are used. Input and target
-standardizers are fitted on training windows only.
+The implementation is a compact research adaptation of TimeMixer's multiscale
+ideas rather than a line-for-line reproduction of the official benchmark code
+\cite{wang2024timemixer}. The 168-hour input is downsampled across several
+scales, decomposed into smooth and residual components, mixed by MLP blocks,
+and mapped to the five forecast horizons. The learned multiscale embedding is
+also reused by residual XGBoost. Huber loss, AdamW, gradient clipping, and
+early stopping are used; input and target standardizers are fitted on training
+windows only.
 
 \subsection{Gated residual XGBoost}
 \label{sec:residual}
 
-The residual-calibration interval is divided chronologically into an earlier
-residual-fit subset (70\%) and a later gate-selection subset (30\%). For each
-horizon, the residual is centred by its calibration median, learned by a
-separate robust XGBoost model, clipped to calibration quantiles, and then
-scaled by a held-out gate:
+The residual-calibration interval is split chronologically into residual-fit
+(70\%) and gate-selection (30\%) subsets. For each horizon, the residual is
+median-centred, learned by a robust XGBoost model, clipped to calibration
+quantiles, and scaled by a held-out gate:
 \begin{equation}
 \hat y^{HYB}_{t,h}
 =\hat y^{TM}_{t,h}
@@ -349,27 +370,13 @@ scaled by a held-out gate:
 +\lambda_t\,\operatorname{median}(\mathcal E_{t,h}).
 \end{equation}
 Here \(\gamma_h\in\{0,0.10,0.25,0.50,0.75,1\}\) is selected on the later
-calibration subset. The explicit choice \(\gamma_h=0\) falls back to the
-TimeMixer base when the correction does not improve held-out calibration MAE.
-The context vector contains origin-safe lag and shifted rolling features,
-instrument type, cyclic calendar variables, missingness state, gap length,
-interpolation status, and measurement-quality flags. The complete base
-forecast vector and latent embedding are also supplied to every horizon model.
-
-Each residual booster uses pseudo-Huber loss, bounded correction quantiles,
-row and feature subsampling, and \(L_1/L_2\) regularization. The gate
-\(\gamma_h\) is selected on \(\mathcal C_g\), not on the test set. If no
-correction improves calibration MAE, \(\gamma_h=0\) falls back to the
-TimeMixer base. The rolling set \(\mathcal E_{t,h}\) contains only errors from
-the previous 30 days whose target timestamps are no later than origin \(t\);
-shrinkage prevents unstable updates when few errors are available.
-
-\begin{figure}[H]
-\centering
-\includegraphics[draft=false,width=0.88\linewidth]{00_framework.png}
-\caption{End-to-end framework. TimeMixer supplies the multi-horizon base forecast; a later calibration interval fits and gates the robust residual correction before locked testing.}
-\label{fig:framework}
-\end{figure}
+calibration subset, so \(\gamma_h=0\) can fall back to TimeMixer when correction
+does not improve calibration MAE. The context vector contains origin-safe lags,
+shifted rolling features, instrument type, calendar variables, missingness
+state, gap length, interpolation status, measurement-quality flags, the full
+base forecast vector, and the latent embedding. Each residual booster uses
+pseudo-Huber loss, row/feature subsampling, \(L_1/L_2\) regularization, and a
+rolling 30-day error set whose target timestamps are no later than origin \(t\).
 
 \subsection{Experimental setup}
 \label{sec:setup}
@@ -461,6 +468,13 @@ covering all five stations, seeds 0--4, and the 30-epoch configuration, so the
 reported comparison is not based on a cherry-picked single run.
 
 \IfFileExists{generated_results.tex}{\input{generated_results.tex}}{}
+
+The same result files also drive the submitted interactive dashboard. The
+application is intentionally a research explorer rather than a live warning
+service: it presents station data quality, grouped model metrics, residual
+gate behaviour, generated figures, and static explanation panels from the
+completed experiment artifacts. This makes the paper's numerical claims
+traceable to the repository outputs used in the presentation and prototype.
 
 Table~\ref{tab:multistation-mae} explains which models are strongest by
 horizon. \textbf{XGBoost} is strongest at 1 hour, while \textbf{LSTM} is
@@ -561,7 +575,7 @@ with a meteorology-assisted setting under the same locked-test protocol. The
 workflow should still preserve raw audit fields, abstain across unresolved
 long gaps, and keep the locked test independent of model tuning.
 
-\section{Conclusion}
+\section{Conclusion and Future Work}
 \label{sec:conclusion}
 
 This paper evaluated a gated TimeMixer-XGBoost approach for multi-horizon
@@ -593,7 +607,11 @@ negative results; instead, it explains why they occur, identifies the horizons
 where residual correction is most useful, and leaves a reproducible path for
 future improvement. The next step is to strengthen the base forecaster and add
 forecast-available external drivers while keeping the same leakage-safe
-evaluation protocol.
+evaluation protocol. Future research should compare the PM2.5-only setting
+with meteorology-assisted variants, test leave-one-station-out transfer, and
+study regime-specific calibration for stations with instrument transitions.
+The dashboard can also be extended from an artifact explorer into a deployed
+monitoring tool once live data ingestion and retraining safeguards are added.
 
 Overall, the study shows that a hybrid architecture should be judged not by
 whether it sounds more advanced, but by whether each added component improves
@@ -609,7 +627,6 @@ conditions must be preserved.
 \section*{Conflict of Interest}
 The author declares no conflict of interest.
 
-\clearpage
 \begingroup
 \small
 \bibliographystyle{unsrt}
