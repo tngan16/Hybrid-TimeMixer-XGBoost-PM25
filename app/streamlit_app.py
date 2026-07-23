@@ -11,6 +11,7 @@ import streamlit as st
 from components.about_tab import render_about
 from components.chatbot_tab import render_chatbot
 from components.figures_tab import render_figures
+from components.forecast_tab import render_forecast
 from components.overview_tab import render_overview
 from components.performance_tab import render_performance
 
@@ -39,6 +40,7 @@ st.sidebar.caption("Hybrid TimeMixer-XGBoost research artifacts")
 MENU = {
     "Dataset Analytics": render_overview,
     "Performance Dashboard": render_performance,
+    "Forecast Demo + AI": render_forecast,
     "Generated Figures": render_figures,
     "Research Q&A": render_chatbot,
     "About": render_about,
